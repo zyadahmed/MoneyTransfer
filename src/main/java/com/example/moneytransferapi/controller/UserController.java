@@ -1,14 +1,11 @@
 package com.example.moneytransferapi.controller;
 
-import com.example.moneytransferapi.dto.LoginDto;
-import com.example.moneytransferapi.dto.RegistrationDto;
-import com.example.moneytransferapi.dto.TokenDto;
-import com.example.moneytransferapi.dto.UserDto;
+import com.example.moneytransferapi.dto.*;
 import com.example.moneytransferapi.entity.User;
 import com.example.moneytransferapi.enums.Role;
 import com.example.moneytransferapi.exception.InvalidUserDataException;
 import com.example.moneytransferapi.repositorie.UserRepository;
-import com.example.moneytransferapi.service.UserService;
+import com.example.moneytransferapi.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,30 +20,24 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@Valid @RequestBody RegistrationDto newUser, BindingResult bindingResult) {
-        try {
-            User savedUser = userService.createUser(newUser, bindingResult);
-
+    public ResponseEntity<ResponseUserDTo> createUser(@Valid @RequestBody RegistrationDto newUser, BindingResult bindingResult) {
+            ResponseUserDTo savedUser = userService.createUser(newUser, bindingResult);
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-        } catch (InvalidUserDataException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginDto loginDto, BindingResult bindingResult) {
-
-        TokenDto token =  userService.login(loginDto,bindingResult);
+    public ResponseEntity<TokensDto> login(@Valid @RequestBody LoginDto loginDto, BindingResult bindingResult) {
+        TokensDto token =  userService.login(loginDto,bindingResult);
         return ResponseEntity.ok(token);
     }
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody TokenDto tokenDto){
+    public ResponseEntity<String> logout(@RequestBody TokensDto tokenDto){
         System.out.println("Received TokenDto: " + tokenDto.getAccessToken());
         return  ResponseEntity.ok(userService.logout(tokenDto));
     }
-
 
 }

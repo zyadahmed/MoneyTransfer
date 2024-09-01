@@ -5,14 +5,18 @@ import com.example.moneytransferapi.dto.AccountDTO;
 import com.example.moneytransferapi.dto.CreateAccountDTO;
 import com.example.moneytransferapi.entity.Account;
 import com.example.moneytransferapi.entity.User;
+import com.example.moneytransferapi.exception.InvalidAccountData;
+import com.example.moneytransferapi.exception.InvalidUserDataException;
 import com.example.moneytransferapi.exception.UnauthorizedAccessException;
 import com.example.moneytransferapi.exception.UserNotFoundException;
 import com.example.moneytransferapi.repositorie.AccountRepository;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import java.util.Date;
 import java.util.List;
@@ -25,8 +29,18 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     private final UserRepository userRepository;
+    private final ModelMapper mapper;
 
-    public Account createAccount(CreateAccountDTO createAccountDTO){
+    public AccountDTO createAccount(CreateAccountDTO createAccountDTO, BindingResult bindingResult){
+
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMessage = new StringBuilder("Invalid Account Registration Data: ");
+            bindingResult.getAllErrors().forEach(error ->
+                    errorMessage.append(error.getDefaultMessage()).append("; ")
+            );
+            throw new InvalidAccountData(errorMessage.toString());
+        }
+
         Optional<User> currentUser = userRepository.findById(createAccountDTO.getUserId());
         if (currentUser.isEmpty()){
             throw new UserNotFoundException("User Not Found");
@@ -36,14 +50,16 @@ public class AccountService {
         if (!u.getEmail().equals(userDetails.getUsername())){
             throw new UnauthorizedAccessException("unauthorized ");
         }
-        Account account = new Account();
-        account.setType(createAccountDTO.getType());
-        account.setBalance(createAccountDTO.getBalance());
-        account.setCreated_at(new Date());
-        account.setUser(u);
+//        Account account = new Account();
+//        account.setType(createAccountDTO.getType());
+//        account.setBalance(createAccountDTO.getBalance());
+//        account.setCreated_at(new Date());
+//        account.setUser(u);
+        Account account = mapper.map(createAccountDTO,Account.class);
+//        mapper.map()
 
         Account savedAccount = accountRepository.save(account);
-        return savedAccount;
+        return mapper.map(savedAccount, AccountDTO.class);
 
     }
     public List<AccountDTO> getUserAccountsByMail() {

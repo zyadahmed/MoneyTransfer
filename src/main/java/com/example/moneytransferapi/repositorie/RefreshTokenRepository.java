@@ -5,7 +5,9 @@ import com.example.moneytransferapi.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,5 +20,11 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Integ
 
     @Query("SELECT rt FROM RefreshToken rt WHERE rt.user.email = :email")
     List<RefreshToken> findAllByUserEmail(String email);
+
+
+    @Query("SELECT rt.expireDate FROM RefreshToken rt WHERE rt.token = :token")
+    Optional<LocalDateTime> findExpireDateByToken(@Param("token") String token);
+
+
 
 }

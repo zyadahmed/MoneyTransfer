@@ -1,8 +1,9 @@
 package com.example.moneytransferapi.service;
 
-import com.example.moneytransferapi.dto.TokenDto;
+import com.example.moneytransferapi.dto.TokensDto;
 import com.example.moneytransferapi.entity.RefreshToken;
 import com.example.moneytransferapi.entity.User;
+import com.example.moneytransferapi.exception.InvalidRefreshTokenException;
 import com.example.moneytransferapi.repositorie.RefreshTokenRepository;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import com.example.moneytransferapi.security.UserSecurityAdapter;
@@ -25,7 +26,6 @@ import java.util.UUID;
 public class TokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtService;
 
@@ -46,7 +46,6 @@ public class TokenService {
     public Optional<RefreshToken> validRefreshToken(String refreshToken) {
         String userMail = jwtService.extractClaim(refreshToken, Claims::getSubject);
         List<RefreshToken> tokens = refreshTokenRepository.findAllByUserEmail(userMail);
-        Optional<RefreshToken> validToken;
         for (RefreshToken token : tokens) {
             if (passwordEncoder.matches(refreshToken, token.getToken())) {
                 if (token.getExpireDate().isAfter(LocalDateTime.now()) && !token.isUsedToken()) {
@@ -76,8 +75,8 @@ public class TokenService {
         refreshTokenRepository.markAllTokensAsUsed(user);
     }
 
-    public TokenDto refreshAccessToken(String refreshToken) {
-        Optional<RefreshToken> savedrefreshTokenOptional= validRefreshToken(refreshToken);   // valid return exist in database
+    public TokensDto refreshAccessToken(String refreshToken) {
+        Optional<RefreshToken> savedrefreshTokenOptional= validRefreshToken(refreshToken);
         if (savedrefreshTokenOptional.isPresent()) {
 
             User user = getUserFromRefreshToken(savedrefreshTokenOptional.get().getToken());
@@ -86,11 +85,11 @@ public class TokenService {
             String newAccessToken = jwtService.generateToken(new UserSecurityAdapter(user));
             String newRefreshToken = generateRefreshToken(user);
 
-            return new TokenDto(newAccessToken, newRefreshToken);
+            return new TokensDto(newAccessToken, newRefreshToken);
         } else {
             User user = getUserFromRefreshToken(refreshToken);
             markAllTokensAsUsed(user);
-            throw new RuntimeException("Invalid or expired refresh token");
+            throw new InvalidRefreshTokenException("Invalid or expired refresh token");
         }
     }
 }

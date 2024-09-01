@@ -1,9 +1,6 @@
 package com.example.moneytransferapi.service;
 
-import com.example.moneytransferapi.dto.LoginDto;
-import com.example.moneytransferapi.dto.RegistrationDto;
-import com.example.moneytransferapi.dto.TokenDto;
-import com.example.moneytransferapi.dto.UserDto;
+import com.example.moneytransferapi.dto.*;
 import com.example.moneytransferapi.entity.User;
 import com.example.moneytransferapi.enums.Role;
 import com.example.moneytransferapi.exception.InvalidUserDataException;
@@ -31,7 +28,7 @@ import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements IUserService{
 
 
     private RedisTemplate<String, String> redisTemplate;
@@ -46,9 +43,9 @@ public class UserService {
 
 
 
-    public User createUser(RegistrationDto newUser, BindingResult bindingResult) {
+    public ResponseUserDTo createUser(RegistrationDto newUser, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder("Invalid user data: ");
+            StringBuilder errorMessage = new StringBuilder("Invalid user Registration Data: ");
             bindingResult.getAllErrors().forEach(error ->
                     errorMessage.append(error.getDefaultMessage()).append("; ")
             );
@@ -65,14 +62,13 @@ public class UserService {
 
         user = userRepository.saveAndFlush(user);
 
-        UserDto dto =  mapper.map(user, UserDto.class);
-        return user;
+        ResponseUserDTo responseUserDTo =  mapper.map(user, ResponseUserDTo.class);
+        return responseUserDTo;
     }
     
-    public TokenDto login(LoginDto loginDto,BindingResult bindingResult) {
+    public TokensDto login(LoginDto loginDto,BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String e = new String("Invalid login data ");
-
+            String e = new String("User or password Incorrect");
             throw new InvalidUserDataException(e);
         }
         try {
@@ -87,7 +83,7 @@ public class UserService {
             User user = userRepository.findUserByEmail(loginDto.getEmail())
                     .orElseThrow(() -> new InvalidUserDataException("User not found"));
 
-            return new TokenDto(jwtUtil.generateToken(userDetails),tokenService.generateRefreshToken(user));
+            return new TokensDto(jwtUtil.generateToken(userDetails),tokenService.generateRefreshToken(user));
 
         } catch (AuthenticationException e) {
             throw new InvalidUserDataException("Invalid email or password.");
@@ -95,10 +91,10 @@ public class UserService {
     }
 
 
-    public String logout(TokenDto tokenDto) {
-        Function<Claims, Date> extractEXpire = Claims::getExpiration;
+    public String logout(TokensDto tokenDto) {
+        Function<Claims, Date> extractExpire = Claims::getExpiration;
 
-        Date expiration = jwtUtil.extractClaim(tokenDto.getAccessToken(),extractEXpire);
+        Date expiration = jwtUtil.extractClaim(tokenDto.getAccessToken(),extractExpire);
         Date now = new Date();
         long diffInMillis = expiration.getTime() - now.getTime();
 

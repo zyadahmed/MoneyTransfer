@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TokenDto {
+public class TokensDto {
 
     private  String AccessToken;
     private String RefreshToken;
