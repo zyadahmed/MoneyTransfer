@@ -22,7 +22,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_id_seq")
     @SequenceGenerator(name = "account_id_seq", sequenceName = "account_id_seq", allocationSize = 1,initialValue=10000000)
     @Column(name = "account_id", updatable = false, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "account_type")
     private String type;
@@ -40,10 +40,10 @@ public class Account {
     private User user;
 
     @OneToMany(mappedBy = "senderAccount")
-    private List<Transcation> sentTransactions;
+    private List<Transaction> sentTransactions;
 
     @OneToMany(mappedBy = "receiverAccount")
-    private List<Transcation> receivedTransactions;
+    private List<Transaction> receivedTransactions;
 
 
 }

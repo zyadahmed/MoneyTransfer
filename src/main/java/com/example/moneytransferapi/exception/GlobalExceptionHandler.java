@@ -26,6 +26,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> invalidRefreshTokenException(InvalidRefreshTokenException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+    @ExceptionHandler(TrancationBalanceException.class)
+    public ResponseEntity<String> trancationBalanceException(TrancationBalanceException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 
 
 

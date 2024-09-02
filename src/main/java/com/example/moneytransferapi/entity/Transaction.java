@@ -2,10 +2,8 @@ package com.example.moneytransferapi.entity;
 
 import com.example.moneytransferapi.enums.TransactionStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transcation {
+@Builder
+public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transcation_id")
@@ -23,13 +22,13 @@ public class Transcation {
 
     @Column(nullable = false)
     private Long amoumt;
-    private String type;
 
 
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
     @Column(name = "created_timeStamp", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdTimeStamp;
 
     @ManyToOne

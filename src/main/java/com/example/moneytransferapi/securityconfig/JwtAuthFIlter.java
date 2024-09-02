@@ -25,7 +25,7 @@ public class JwtAuthFIlter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final RedisService redisService;
     private static final String TOKEN_PREFIX = "b:";
-
+  ///    | | | | |
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -47,7 +47,7 @@ public class JwtAuthFIlter extends OncePerRequestFilter {
         Function<Claims,String> extractEmail = Claims::getSubject;
         String usermail = jwt.extractClaim(authToken,extractEmail);
 
-        UserDetails currentUser = userDetailsService.loadUserByUsername(usermail);
+        UserDetails currentUser = userDetailsService.loadUserByUsername(usermail); // ziad@gmai.com
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(currentUser, null, currentUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);

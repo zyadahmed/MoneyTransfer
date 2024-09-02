@@ -10,7 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class AccountDTO {
-    private int id;
+    private Long id;
     private String type;
     private Long balance;
     private Date created_at;
