@@ -18,8 +18,4 @@ public interface IAccountService {
     AccountDTO getAccountById(Long accountId);
 
     BalanceDto getAccountBalance(Long accountId);
-
-
-
-
 }

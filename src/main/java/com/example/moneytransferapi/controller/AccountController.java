@@ -46,12 +46,12 @@ public class AccountController {
     }
 
     @GetMapping("/GetAccountByID")
-    public AccountDTO viewAccountByID(@RequestParam Long accountID) {
-        return accountService.getAccountById(accountID);
+    public ResponseEntity<AccountDTO> getAccountById(@RequestParam Long accountID) {
+        return new ResponseEntity<>(accountService.getAccountById(accountID), HttpStatus.OK);
     }
 
     @GetMapping("/GetAccountBalance")
-    public BalanceDto viewAccountBalance(@RequestParam Long accountID) {
-        return accountService.getAccountBalance(accountID);
+    public ResponseEntity<BalanceDto> getAccountBalance(@RequestParam Long accountID) {
+        return new ResponseEntity<>(accountService.getAccountBalance(accountID), HttpStatus.OK);
     }
 }
