@@ -113,8 +113,11 @@ public class AccountServiceImpl implements IAccountService{
     }
 
     @Override
-    public List<AccountDTO> viewAllUserAccounts() {
-        return null;
+    public List<AccountDTO> viewAllUserAccounts(HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromRequest(request);
+        int currentUserId = jwtUtil.extractUserId(token);
+        List<Account> accounts = accountRepository.findByUserId(currentUserId);
+        return accounts.stream().map(account -> mapper.map(account,AccountDTO.class)).toList();
     }
 
     @Override

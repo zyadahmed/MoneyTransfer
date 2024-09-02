@@ -13,7 +13,7 @@ public interface IAccountService {
 
     ResponseTransactionDTO createTrascation(RequestTrascationDto requestTrascationDto, BindingResult bindingResult, HttpServletRequest request);
 
-    List<AccountDTO> viewAllUserAccounts();
+    List<AccountDTO> viewAllUserAccounts(HttpServletRequest request);
 
     AccountDTO getAccountById(Long accountId);
 

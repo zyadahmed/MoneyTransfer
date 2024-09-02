@@ -1,6 +1,7 @@
 package com.example.moneytransferapi.controller;
 
 import com.example.moneytransferapi.dto.*;
+import com.example.moneytransferapi.service.AccountServiceImpl;
 import com.example.moneytransferapi.service.IAccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -37,5 +38,9 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-
+    @GetMapping("/ViewUserAccount")
+    public ResponseEntity<ResponseAccountDto> viewUserAccount(HttpServletRequest request) {
+         accountService.viewAllUserAccounts(request);
+         return ResponseEntity.ok().body(new ResponseAccountDto());
+    }
 }
