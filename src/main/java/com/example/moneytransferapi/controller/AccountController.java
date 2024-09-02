@@ -5,6 +5,7 @@ import com.example.moneytransferapi.service.AccountServiceImpl;
 import com.example.moneytransferapi.service.IAccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,22 +22,17 @@ public class AccountController {
     private final IAccountService accountService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseAccountDto> createAccount(@RequestBody @Valid RegisterationAccountDto registerationAccountDto,BindingResult bindingResult, HttpServletRequest request){
-       ResponseAccountDto response =  accountService.createAccount(registerationAccountDto,bindingResult,request);
+    public ResponseEntity<ResponseAccountDto> createAccount(@RequestBody @Valid RegisterationAccountDto registerationAccountDto , HttpServletRequest request){
+       ResponseAccountDto response =  accountService.createAccount(registerationAccountDto,request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/transaction")
     public ResponseEntity<ResponseTransactionDTO> createTransaction(
             @RequestBody RequestTrascationDto requestTransactionDto,
-            BindingResult bindingResult,
             HttpServletRequest request) {
 
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        ResponseTransactionDTO response = accountService.createTrascation(requestTransactionDto, bindingResult, request);
+        ResponseTransactionDTO response = accountService.createTrascation(requestTransactionDto, request);
         return ResponseEntity.ok(response);
     }
 
@@ -45,13 +41,13 @@ public class AccountController {
         return accountService.viewAllUserAccounts(request);
     }
 
-    @GetMapping("/GetAccountByID")
-    public ResponseEntity<AccountDTO> getAccountById(@RequestParam Long accountID) {
-        return new ResponseEntity<>(accountService.getAccountById(accountID), HttpStatus.OK);
+    @GetMapping("/GetAccountByID/{accountID}")
+    public ResponseEntity<AccountDTO> getAccountById(@PathVariable  Long accountID, HttpServletRequest request) {
+        return new ResponseEntity<>(accountService.getAccountById(request,accountID), HttpStatus.OK);
     }
 
-    @GetMapping("/GetAccountBalance")
-    public ResponseEntity<BalanceDto> getAccountBalance(@RequestParam Long accountID) {
-        return new ResponseEntity<>(accountService.getAccountBalance(accountID), HttpStatus.OK);
+    @GetMapping("/GetAccountBalance/{accountID}")
+    public ResponseEntity<BalanceDto> getAccountBalance(@PathVariable Long accountID,HttpServletRequest request) {
+        return new ResponseEntity<>(accountService.getAccountBalance(request,accountID), HttpStatus.OK);
     }
 }

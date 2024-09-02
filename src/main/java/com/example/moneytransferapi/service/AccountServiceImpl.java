@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -40,7 +41,7 @@ public class AccountServiceImpl implements IAccountService{
 
 
     @Override
-    public ResponseAccountDto createAccount(RegisterationAccountDto registrationDto, BindingResult bindingResult, HttpServletRequest request) {
+    public ResponseAccountDto createAccount(RegisterationAccountDto registrationDto, HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
         int currentUserId = jwtUtil.extractUserId(token);
         Optional<User> currentOptional  = userRepository.findById(currentUserId);
@@ -65,22 +66,18 @@ public class AccountServiceImpl implements IAccountService{
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public ResponseTransactionDTO createTrascation(RequestTrascationDto requestTrascationDto, BindingResult bindingResult, HttpServletRequest request) {
-
+    public ResponseTransactionDTO createTrascation(RequestTrascationDto requestTrascationDto , HttpServletRequest request) {
 
         float roundedBalance = Math.round(requestTrascationDto.getAmount() * 100.0f) / 100.0f;
         long amountInLong = (long) (roundedBalance * 100);
 
-        // account
         String token = jwtUtil.getTokenFromRequest(request);
         int currentUserId = jwtUtil.extractUserId(token);
-        Optional<Account> currentAccountOpt = accountRepository.findById(requestTrascationDto.getSenderAccountNum());
-        Optional<Account> reciverAccountOpt = accountRepository.findById(requestTrascationDto.getReciverAccountNum());
-        if (currentAccountOpt.isEmpty() || reciverAccountOpt.isEmpty()){
-            throw new InvalidAccountData("Account Not Found");
-        }
-        Account senderAccount  = currentAccountOpt.get();
-        Account reciverAccount = reciverAccountOpt.get();
+        Account senderAccount = accountRepository.findById(requestTrascationDto.getSenderAccountNum())
+                .orElseThrow(() -> new InvalidAccountData("Sender account not found"));
+        Account receiverAccount = accountRepository.findById(requestTrascationDto.getReciverAccountNum())
+                .orElseThrow(() -> new InvalidAccountData("Receiver account not found"));
+
         if (senderAccount.getUser().getId()!= currentUserId){
             throw  new UnauthorizedAccessException("unauthorized");
         }
@@ -88,27 +85,24 @@ public class AccountServiceImpl implements IAccountService{
             throw new TrancationBalanceException("Balance not enough");
         }
         senderAccount.setBalance(senderAccount.getBalance()-amountInLong);
-        reciverAccount.setBalance(reciverAccount.getBalance()+amountInLong);
-
+        receiverAccount.setBalance(receiverAccount.getBalance()+amountInLong);
 
         accountRepository.save(senderAccount);
-        accountRepository.save(reciverAccount);
+        accountRepository.save(receiverAccount);
         Transaction transaction = Transaction.builder().amoumt(amountInLong)
                 .status(TransactionStatus.SUCCEED)
                 .senderAccount(senderAccount)
-                .receiverAccount(reciverAccount).build();
-
+                .receiverAccount(receiverAccount).build();
 
         trascationRepository.save(transaction);
 
         return  ResponseTransactionDTO.builder()
-                .reciverAccountNum(reciverAccount.getId())
+                .reciverAccountNum(receiverAccount.getId())
                 .senderAccountNum(senderAccount.getId())
                 .trascationTime(LocalDateTime.now())
                 .amount(amountInLong)
                 .status(TransactionStatus.SUCCEED)
                 .build();
-
 
     }
 
@@ -117,29 +111,40 @@ public class AccountServiceImpl implements IAccountService{
         String token = jwtUtil.getTokenFromRequest(request);
         int currentUserId = jwtUtil.extractUserId(token);
         List<Account> accounts = accountRepository.findByUserId(currentUserId);
-        return accounts.stream().map(account -> mapper.map(account,AccountDTO.class)).toList();
+
+        return accounts.stream()
+                .map(account -> {
+                    AccountDTO accountDTO = mapper.map(account, AccountDTO.class);
+                    accountDTO.setBalance( (account.getBalance() / 100.0f));
+                    return accountDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public AccountDTO getAccountById(Long accountId) {
-//        get mapping and path varaible
-        Optional<Account> accountOpt = accountRepository.findById(accountId);
-        if (accountOpt.isEmpty()){
-            throw new InvalidUserDataException("user not found");
+    public AccountDTO getAccountById(HttpServletRequest request,Long accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new InvalidUserDataException("Account not found"));
+
+        String token = jwtUtil.getTokenFromRequest(request);
+        if (!jwtUtil.extractUserId(token).equals(account.getUser().getId())){
+            throw new UnauthorizedAccessException("Unauthorized");
         }
-        Account account = accountOpt.get();
-        return mapper.map(account,AccountDTO.class);
+
+        AccountDTO dto =  mapper.map(account,AccountDTO.class);
+        dto.setBalance(dto.getBalance()/100);
+        return dto;
     }
 
     @Override
-    public BalanceDto getAccountBalance(Long accountId) {
+    public BalanceDto getAccountBalance(HttpServletRequest request,Long accountId) {
         Optional<Account> accountOpt = accountRepository.findById(accountId);
         if (accountOpt.isEmpty()) {
-            throw new InvalidUserDataException("Account not found");
+            throw new InvalidAccountData("Account not found");
         }
         Account account = accountOpt.get();
         BalanceDto balanceDto = new BalanceDto();
-        balanceDto.setBalance(account.getBalance());
+        balanceDto.setBalance((float) account.getBalance() /100);
         return balanceDto;
     }
 

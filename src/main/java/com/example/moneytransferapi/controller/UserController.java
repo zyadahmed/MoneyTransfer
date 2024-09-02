@@ -23,15 +23,15 @@ public class UserController {
     private final IUserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseUserDTo> createUser(@Valid @RequestBody RegistrationDto newUser, BindingResult bindingResult) {
-            ResponseUserDTo savedUser = userService.createUser(newUser, bindingResult);
+    public ResponseEntity<ResponseUserDTo> createUser(@Valid @RequestBody RegistrationDto newUser) {
+            ResponseUserDTo savedUser = userService.createUser(newUser);
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
 
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokensDto> login(@Valid @RequestBody LoginDto loginDto, BindingResult bindingResult) {
-        TokensDto token =  userService.login(loginDto,bindingResult);
+    public ResponseEntity<TokensDto> login(@Valid @RequestBody LoginDto loginDto) {
+        TokensDto token =  userService.login(loginDto);
         return ResponseEntity.ok(token);
     }
     @PostMapping("/logout")

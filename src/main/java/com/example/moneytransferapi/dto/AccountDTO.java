@@ -12,7 +12,7 @@ import java.util.Date;
 public class AccountDTO {
     private Long id;
     private String type;
-    private Long balance;
+    private float balance;
     private Date created_at;
     private int userId;
 }

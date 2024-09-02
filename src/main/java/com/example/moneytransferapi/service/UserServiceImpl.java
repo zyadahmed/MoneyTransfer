@@ -42,35 +42,21 @@ public class UserServiceImpl implements IUserService{
     private static final String TOKEN_PREFIX = "b:";
 
 
-
-    public ResponseUserDTo createUser(RegistrationDto newUser, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder("Invalid user Registration Data: ");
-            bindingResult.getAllErrors().forEach(error ->
-                    errorMessage.append(error.getDefaultMessage()).append("; ")
-            );
-            throw new InvalidUserDataException(errorMessage.toString());
-        }
+    public ResponseUserDTo createUser(RegistrationDto newUser) {
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new InvalidUserDataException("Email already exists.");
         }
-
         User user = mapper.map(newUser, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
 
         user = userRepository.saveAndFlush(user);
 
-        ResponseUserDTo responseUserDTo =  mapper.map(user, ResponseUserDTo.class);
-        return responseUserDTo;
+        return mapper.map(user, ResponseUserDTo.class);
     }
     
-    public TokensDto login(LoginDto loginDto,BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            String e = new String("User or password Incorrect");
-            throw new InvalidUserDataException(e);
-        }
+    public TokensDto login(LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -89,7 +75,6 @@ public class UserServiceImpl implements IUserService{
             throw new InvalidUserDataException("Invalid email or password.");
         }
     }
-
 
     public String logout(TokensDto tokenDto) {
         Function<Claims, Date> extractExpire = Claims::getExpiration;

@@ -1,6 +1,7 @@
 package com.example.moneytransferapi.dto;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,5 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class RefreshTokenDto {
+
+    @NotBlank(message = "token required")
     private String refreshToken;
 }

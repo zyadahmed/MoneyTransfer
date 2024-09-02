@@ -9,13 +9,13 @@ import java.util.List;
 public interface IAccountService {
 
 
-    ResponseAccountDto createAccount(RegisterationAccountDto registerationDto, BindingResult bindingResult, HttpServletRequest request);
+    ResponseAccountDto createAccount(RegisterationAccountDto registerationDto, HttpServletRequest request);
 
-    ResponseTransactionDTO createTrascation(RequestTrascationDto requestTrascationDto, BindingResult bindingResult, HttpServletRequest request);
+    ResponseTransactionDTO createTrascation(RequestTrascationDto requestTrascationDto, HttpServletRequest request);
 
     List<AccountDTO> viewAllUserAccounts(HttpServletRequest request);
 
-    AccountDTO getAccountById(Long accountId);
+    AccountDTO getAccountById(HttpServletRequest request,Long accountId);
 
-    BalanceDto getAccountBalance(Long accountId);
+    BalanceDto getAccountBalance(HttpServletRequest request,Long accountId);
 }

@@ -7,9 +7,9 @@ import com.example.moneytransferapi.dto.TokensDto;
 import org.springframework.validation.BindingResult;
 
 public interface IUserService {
-    ResponseUserDTo createUser(RegistrationDto newUser, BindingResult bindingResult);
+    ResponseUserDTo createUser(RegistrationDto newUser);
 
-    TokensDto login(LoginDto loginDto, BindingResult bindingResult);
+    TokensDto login(LoginDto loginDto );
 
     String logout(TokensDto tokenDto);
 }
