@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/accounts")
 @RequiredArgsConstructor
@@ -39,8 +41,17 @@ public class AccountController {
     }
 
     @GetMapping("/ViewUserAccount")
-    public ResponseEntity<ResponseAccountDto> viewUserAccount(HttpServletRequest request) {
-         accountService.viewAllUserAccounts(request);
-         return ResponseEntity.ok().body(new ResponseAccountDto());
+    public List<AccountDTO> viewAllUserAccounts(HttpServletRequest request) {
+        return accountService.viewAllUserAccounts(request);
+    }
+
+    @GetMapping("/GetAccountByID")
+    public AccountDTO viewAccountByID(@RequestParam Long accountID) {
+        return accountService.getAccountById(accountID);
+    }
+
+    @GetMapping("/GetAccountBalance")
+    public BalanceDto viewAccountBalance(@RequestParam Long accountID) {
+        return accountService.getAccountBalance(accountID);
     }
 }

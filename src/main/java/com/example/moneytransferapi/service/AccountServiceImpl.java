@@ -122,11 +122,25 @@ public class AccountServiceImpl implements IAccountService{
 
     @Override
     public AccountDTO getAccountById(Long accountId) {
-        return null;
+//        get mapping and path varaible
+        Optional<Account> accountOpt = accountRepository.findById(accountId);
+        if (accountOpt.isEmpty()){
+            throw new InvalidUserDataException("user not found");
+        }
+        Account account = accountOpt.get();
+        return mapper.map(account,AccountDTO.class);
     }
 
     @Override
     public BalanceDto getAccountBalance(Long accountId) {
-        return null;
+        Optional<Account> accountOpt = accountRepository.findById(accountId);
+        if (accountOpt.isEmpty()) {
+            throw new InvalidUserDataException("Account not found");
+        }
+        Account account = accountOpt.get();
+        BalanceDto balanceDto = new BalanceDto();
+        balanceDto.setBalance(account.getBalance());
+        return balanceDto;
     }
+
 }
