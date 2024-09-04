@@ -22,7 +22,7 @@ public class RegistrationDto {
     @Email(message = "not valid Email")
     private String email;
     @NotBlank(message = "password is mandatory")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters long, contain at least one letter, one digit, and one special character.")
+//    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters long, contain at least one letter, one digit, and one special character.")
     private String password;
 
     @NotBlank(message = "Country is required")
