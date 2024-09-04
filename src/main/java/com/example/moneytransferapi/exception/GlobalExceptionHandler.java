@@ -4,9 +4,13 @@ import com.example.moneytransferapi.exception.customResonse.ValidationFailedResp
 import com.example.moneytransferapi.exception.customResonse.ViolationErrors;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,6 +22,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidUserDataException.class)
     public ResponseEntity<String> inValidUserRegistration(InvalidUserDataException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(PSQLException.class)
+    public ResponseEntity<ProblemDetail> handlePSQLException(PSQLException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Database error");
+        problemDetail.setDetail(ex.getMessage());
+
+        return new ResponseEntity<>(problemDetail, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundException.class)

@@ -52,7 +52,6 @@ public class UserServiceImpl implements IUserService{
         user.setRole(Role.USER);
 
         user = userRepository.saveAndFlush(user);
-
         return mapper.map(user, ResponseUserDTo.class);
     }
     

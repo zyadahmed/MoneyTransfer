@@ -38,12 +38,14 @@ public class FavouriteServiceImp implements IFavouriteService{
     public FavouriteDTO addFavourite(FavouriteDTO favouriteDTO, HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
         int userIdToken = jwtUtil.extractUserId(token);
-        Optional<Favourite> favouriteOpt = favouriteRepository.findByUserIdAndAccountId
-                (favouriteDTO.getUserId(), favouriteDTO.getAccountId());
+//        Optional<Favourite> favouriteOpt = favouriteRepository.findByUserIdAndAccountId
+//                (favouriteDTO.getUserId(), favouriteDTO.getAccountId());
+
         if(userIdToken != favouriteDTO.getUserId()){
             throw new UnauthorizedAccessException("Wrong Resources");
         }
-        Favourite favourite = favouriteOpt.get();
+        Favourite favourite = new Favourite();
+        favourite.setUserId(userIdToken); //
         favourite.setAccountId(favouriteDTO.getAccountId());
         favourite.setName(favouriteDTO.getName());
         favouriteRepository.save(favourite);
