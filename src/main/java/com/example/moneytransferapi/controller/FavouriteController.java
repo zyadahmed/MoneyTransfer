@@ -1,6 +1,7 @@
 package com.example.moneytransferapi.controller;
 
 import com.example.moneytransferapi.dto.FavouriteDTO;
+import com.example.moneytransferapi.dto.ResponseFavouriteDTO;
 import com.example.moneytransferapi.repositorie.FavouriteRepository;
 import com.example.moneytransferapi.service.IFavouriteService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/Favoutire")
@@ -22,12 +25,13 @@ public class FavouriteController {
         return favouriteService.addFavourite(favouriteDTO, request);
     }
 
-    @DeleteMapping("/{favoriteId}")
-    public void deleteFavorite(@PathVariable Long favoriteId) {
-        favouriteService.deleteFavourite(favoriteId);
+    @DeleteMapping("/{accountId}")
+    public ResponseFavouriteDTO deleteFavorite(@PathVariable @Valid FavouriteDTO favouriteDTO) {
+        return favouriteService.deleteFavourite(favouriteDTO);
     }
-//    @GetMapping
-//    public List<FavoriteDTO> getFavorites(@RequestParam Long userId) {
-//        return favoriteService.getFavorites(userId);
-//    }
+
+    @GetMapping("/GetFavoutite")
+    public List<FavouriteDTO> getFavorites(@RequestParam FavouriteDTO favouriteDTO) {
+        return favouriteService.getFavorites(favouriteDTO);
+    }
 }

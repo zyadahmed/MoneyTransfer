@@ -34,7 +34,4 @@ public class Favourite {
     @ManyToOne
     @JoinColumn(name = "account_id", insertable = false, updatable = false)
     private Account account;
-
-
-
 }
