@@ -13,9 +13,14 @@ import com.example.moneytransferapi.repositorie.AccountRepository;
 import com.example.moneytransferapi.repositorie.TrascationRepository;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import com.example.moneytransferapi.utilitys.JwtUtil;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -38,6 +43,7 @@ public class AccountServiceImpl implements IAccountService{
     private final JwtUtil jwtUtil;
     private final ModelMapper mapper;
     private final TrascationRepository trascationRepository;
+    private final EntityManager entityManager;
 
 
     @Override
@@ -57,10 +63,11 @@ public class AccountServiceImpl implements IAccountService{
         Account account = mapper.map(registrationDto, Account.class);
         account.setUser(currentUser);
         account.setBalance(balanceAsLong);
-        Account saved = accountRepository.save(account);
-
+        Account saved = accountRepository.saveAndFlush(account);
+        System.out.println(saved.getCreated_at());
         ResponseAccountDto responseAccountDto = mapper.map(saved,ResponseAccountDto.class);
         responseAccountDto.setBalance(responseAccountDto.getBalance()/100);
+
         return  responseAccountDto;
 
     }
@@ -90,7 +97,7 @@ public class AccountServiceImpl implements IAccountService{
 
         accountRepository.save(senderAccount);
         accountRepository.save(receiverAccount);
-        Transaction transaction = Transaction.builder().amoumt(amountInLong)
+        Transaction transaction = Transaction.builder().amount(amountInLong)
                 .status(TransactionStatus.SUCCEED)
                 .senderAccount(senderAccount)
                 .receiverAccount(receiverAccount).build();
@@ -101,7 +108,7 @@ public class AccountServiceImpl implements IAccountService{
                 .reciverAccountNum(receiverAccount.getId())
                 .senderAccountNum(senderAccount.getId())
                 .trascationTime(LocalDateTime.now())
-                .amount(amountInLong)
+                .amount((float) amountInLong /100)
                 .status(TransactionStatus.SUCCEED)
                 .build();
 
@@ -147,6 +154,33 @@ public class AccountServiceImpl implements IAccountService{
         BalanceDto balanceDto = new BalanceDto();
         balanceDto.setBalance((float) account.getBalance() /100);
         return balanceDto;
+    }
+    public Page<TransactionDto> getTransactionForAccount(HttpServletRequest request,ViewTransactionsDto viewTransactionsDto){
+        String token = jwtUtil.getTokenFromRequest(request);
+        int currentUserId = jwtUtil.extractUserId(token);
+        Account account = accountRepository.findById(viewTransactionsDto.getAccountId()).orElseThrow(()-> new InvalidAccountData("Account not found"));
+        if (account.getUser().getId()!=currentUserId){
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+        return getRecentTransactionsForAccount(viewTransactionsDto.getAccountId(), viewTransactionsDto.getPage(), viewTransactionsDto.getSize());
+
+    }
+    private Page<TransactionDto> getRecentTransactionsForAccount(Long accountId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Transaction> transactionsPage = trascationRepository.findAllBySenderAccountIdOrReceiverAccountIdOrderByCreatedTimeStampDesc(accountId, accountId, pageable);
+
+        return transactionsPage.map(transaction -> {
+            float adjustedAmount = transaction.getAmount().floatValue() / 100;
+
+            TransactionDto transactionDto = mapper.map(transaction, TransactionDto.class);
+            transactionDto.setSenderAccountId(transaction.getSenderAccount().getId());
+            transactionDto.setReciverAccountId(transaction.getReceiverAccount().getId());
+            transactionDto.setAmount(adjustedAmount);
+
+
+            return transactionDto;
+        });
     }
 
 }

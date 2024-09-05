@@ -1,5 +1,6 @@
 package com.example.moneytransferapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,12 +38,15 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "senderAccount")
+    @JsonIgnore
     private List<Transaction> sentTransactions;
 
     @OneToMany(mappedBy = "receiverAccount")
+    @JsonIgnore
     private List<Transaction> receivedTransactions;
 
 

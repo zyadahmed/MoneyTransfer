@@ -44,6 +44,11 @@ public class UserController {
     public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto, HttpServletRequest request){
         return ResponseEntity.ok(userService.updatePassword(updatePasswordDto,request));
     }
+    @GetMapping("/info")
+    public ResponseEntity<User> getUserInfo(HttpServletRequest request){
+        return ResponseEntity.ok(userService.getUserWithAccounts(request));
+    }
+
 
 
 

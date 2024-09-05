@@ -111,4 +111,11 @@ public class UserServiceImpl implements IUserService{
         return "Password updated successfully";
 
     }
+
+    @Override
+    public User getUserWithAccounts(HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromRequest(request);
+        int currentUserId = jwtUtil.extractUserId(token);
+        return userRepository.findUserWithAccountsById(currentUserId);
+    }
 }

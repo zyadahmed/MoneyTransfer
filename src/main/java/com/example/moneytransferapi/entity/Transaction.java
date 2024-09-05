@@ -21,7 +21,7 @@ public class Transaction {
     private int id;
 
     @Column(nullable = false)
-    private Long amoumt;
+    private Long amount;
 
 
     @Enumerated(EnumType.STRING)

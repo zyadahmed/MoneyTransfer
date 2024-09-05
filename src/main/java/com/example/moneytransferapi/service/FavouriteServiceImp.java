@@ -4,6 +4,7 @@ import com.example.moneytransferapi.dto.FavouriteDTO;
 import com.example.moneytransferapi.dto.ResponseFavouriteDTO;
 import com.example.moneytransferapi.entity.Favourite;
 import com.example.moneytransferapi.entity.FavouriteId;
+import com.example.moneytransferapi.entity.Transaction;
 import com.example.moneytransferapi.exception.FavouriteNotFound;
 import com.example.moneytransferapi.exception.UnauthorizedAccessException;
 import com.example.moneytransferapi.repositorie.FavouriteRepository;
@@ -76,6 +77,7 @@ public class FavouriteServiceImp implements IFavouriteService {
                         .build())
                 .toList();
     }
+
 
 
 }

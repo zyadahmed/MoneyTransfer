@@ -37,6 +37,7 @@ public class User {
     private Date dateofbirth;
 
     @Column(length = 300)
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)

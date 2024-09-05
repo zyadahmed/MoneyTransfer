@@ -1,12 +1,14 @@
 package com.example.moneytransferapi.controller;
 
 import com.example.moneytransferapi.dto.*;
+import com.example.moneytransferapi.entity.Transaction;
 import com.example.moneytransferapi.service.AccountServiceImpl;
 import com.example.moneytransferapi.service.IAccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -50,4 +52,10 @@ public class AccountController {
     public ResponseEntity<BalanceDto> getAccountBalance(@PathVariable Long accountID,HttpServletRequest request) {
         return new ResponseEntity<>(accountService.getAccountBalance(request,accountID), HttpStatus.OK);
     }
+    @PostMapping("/transaction/all")
+    public ResponseEntity<Page<TransactionDto>> getAccountById(@RequestBody ViewTransactionsDto viewTransactionsDto ,  HttpServletRequest request) {
+        return new ResponseEntity<>(accountService.getTransactionForAccount(request,viewTransactionsDto), HttpStatus.OK);
+    }
+
+
 }
