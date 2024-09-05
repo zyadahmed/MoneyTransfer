@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TrascationRepository extends JpaRepository<Transaction,Long> {
 
-
     Page<Transaction> findAllBySenderAccountIdOrReceiverAccountIdOrderByCreatedTimeStampDesc(Long senderId, Long receiverId, Pageable pageable);
 
 
