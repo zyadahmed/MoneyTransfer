@@ -13,7 +13,7 @@ import java.util.List;
 public interface IFavouriteService {
     FavouriteDTO addFavourite(FavouriteDTO favouriteDTO, HttpServletRequest request);
 
-    ResponseFavouriteDTO deleteFavourite(FavouriteDTO favouriteDTO);
+    ResponseFavouriteDTO deleteFavourite(Long accountId,HttpServletRequest request);
 
-    List<FavouriteDTO> getFavorites(FavouriteDTO favouriteDTO);
+    List<FavouriteDTO> getFavorites(int userId,HttpServletRequest request);
 }

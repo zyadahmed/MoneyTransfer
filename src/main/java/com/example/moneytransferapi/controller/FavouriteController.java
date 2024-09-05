@@ -26,12 +26,12 @@ public class FavouriteController {
     }
 
     @DeleteMapping("/{accountId}")
-    public ResponseFavouriteDTO deleteFavorite(@PathVariable @Valid FavouriteDTO favouriteDTO) {
-        return favouriteService.deleteFavourite(favouriteDTO);
+    public ResponseFavouriteDTO deleteFavorite(@PathVariable @Valid Long accountId, HttpServletRequest request) {
+        return favouriteService.deleteFavourite(accountId ,request);
     }
 
-    @GetMapping("/GetFavoutite")
-    public List<FavouriteDTO> getFavorites(@RequestParam FavouriteDTO favouriteDTO) {
-        return favouriteService.getFavorites(favouriteDTO);
+    @GetMapping("/GetFavoutite/{userId}")
+    public List<FavouriteDTO> getFavorites(@PathVariable int userId, HttpServletRequest request) {
+        return favouriteService.getFavorites(userId,request);
     }
 }

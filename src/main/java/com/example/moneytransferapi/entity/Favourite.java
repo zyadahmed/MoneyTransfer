@@ -22,7 +22,7 @@ public class Favourite {
 
     @Id
     @Column(name = "account_id")
-    private int accountId;
+    private Long accountId;
 
     @Column(name = "name", length = 100)
     private String name;

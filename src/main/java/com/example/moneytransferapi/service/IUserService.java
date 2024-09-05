@@ -1,9 +1,7 @@
 package com.example.moneytransferapi.service;
 
-import com.example.moneytransferapi.dto.LoginDto;
-import com.example.moneytransferapi.dto.RegistrationDto;
-import com.example.moneytransferapi.dto.ResponseUserDTo;
-import com.example.moneytransferapi.dto.TokensDto;
+import com.example.moneytransferapi.dto.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.validation.BindingResult;
 
 public interface IUserService {
@@ -12,4 +10,5 @@ public interface IUserService {
     TokensDto login(LoginDto loginDto );
 
     String logout(TokensDto tokenDto);
+    String updatePassword(UpdatePasswordDto updatePasswordDto, HttpServletRequest request);
 }

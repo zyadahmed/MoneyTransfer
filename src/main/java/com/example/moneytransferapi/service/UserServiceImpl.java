@@ -4,11 +4,13 @@ import com.example.moneytransferapi.dto.*;
 import com.example.moneytransferapi.entity.User;
 import com.example.moneytransferapi.enums.Role;
 import com.example.moneytransferapi.exception.InvalidUserDataException;
+import com.example.moneytransferapi.exception.UserNotFoundException;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import com.example.moneytransferapi.securityconfig.JwtAuthFIlter;
 import com.example.moneytransferapi.utilitys.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +22,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.Date;
@@ -42,6 +45,8 @@ public class UserServiceImpl implements IUserService{
     private static final String TOKEN_PREFIX = "b:";
 
 
+
+    @Transactional
     public ResponseUserDTo createUser(RegistrationDto newUser) {
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
@@ -86,5 +91,24 @@ public class UserServiceImpl implements IUserService{
 
         redisService.storeValue(TOKEN_PREFIX+tokenDto.getAccessToken() ,tokenDto.getAccessToken(),timeToExpire);
         return "Logout Succeeds";
+    }
+
+    @Override
+    @Transactional
+    public String updatePassword(UpdatePasswordDto updatePasswordDto, HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromRequest(request);
+        int currentUserId = jwtUtil.extractUserId(token);
+        User user = userRepository.findById(currentUserId).orElseThrow(() -> new UserNotFoundException("User Not found"));
+
+        if (!passwordEncoder.matches(updatePasswordDto.getOldPassword(), user.getPassword())) {
+            throw new InvalidUserDataException("Old password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(updatePasswordDto.getNewPassword()));
+
+        userRepository.save(user);
+
+        return "Password updated successfully";
+
     }
 }

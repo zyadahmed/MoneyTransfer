@@ -41,6 +41,7 @@ public class AccountServiceImpl implements IAccountService{
 
 
     @Override
+    @Transactional
     public ResponseAccountDto createAccount(RegisterationAccountDto registrationDto, HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
         int currentUserId = jwtUtil.extractUserId(token);

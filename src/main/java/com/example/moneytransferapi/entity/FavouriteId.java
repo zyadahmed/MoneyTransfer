@@ -13,5 +13,5 @@ import java.io.Serializable;
 @Setter
 public class FavouriteId implements Serializable {
     private int userId;
-    private int accountId;
+    private Long accountId;
 }

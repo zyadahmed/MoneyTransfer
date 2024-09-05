@@ -28,8 +28,6 @@ public class FavouriteServiceImp implements IFavouriteService {
     public FavouriteDTO addFavourite(FavouriteDTO favouriteDTO, HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
         int userIdToken = jwtUtil.extractUserId(token);
-//        Optional<Favourite> favouriteOpt = favouriteRepository.findByUserIdAndAccountId
-//                (favouriteDTO.getUserId(), favouriteDTO.getAccountId());
 
         if (userIdToken != favouriteDTO.getUserId()) {
             throw new UnauthorizedAccessException("Wrong Resources");
@@ -48,8 +46,11 @@ public class FavouriteServiceImp implements IFavouriteService {
     }
 
     @Override
-    public ResponseFavouriteDTO deleteFavourite(FavouriteDTO favouriteDTO) {
-        FavouriteId favouriteId = new FavouriteId(favouriteDTO.getUserId(), favouriteDTO.getAccountId());
+    public ResponseFavouriteDTO deleteFavourite(Long accountId,HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromRequest(request);
+        int userIdToken = jwtUtil.extractUserId(token);
+
+        FavouriteId favouriteId = new FavouriteId(userIdToken,accountId);
         if (!favouriteRepository.existsById(favouriteId)) {
             throw new FavouriteNotFound("Favourite Not Found");
         }
@@ -62,10 +63,19 @@ public class FavouriteServiceImp implements IFavouriteService {
     }
 
     @Override
-    public List<FavouriteDTO> getFavorites(FavouriteDTO favouriteDTO) {
-        return favouriteRepository.findByUserId(favouriteDTO.getUserId())
+    public List<FavouriteDTO> getFavorites(int userId, HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromRequest(request);
+        int userIdToken = jwtUtil.extractUserId(token);
+
+        return favouriteRepository.findByUserId(userId)
                 .stream()
-                .map(favourite -> mapper.map(favourite, FavouriteDTO.class))
+                .map(favourite -> FavouriteDTO.builder()
+                        .userId(favourite.getUserId())
+                        .accountId(favourite.getAccountId())
+                        .name(favourite.getName())
+                        .build())
                 .toList();
     }
+
+
 }

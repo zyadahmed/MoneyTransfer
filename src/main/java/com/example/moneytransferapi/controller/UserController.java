@@ -6,6 +6,7 @@ import com.example.moneytransferapi.enums.Role;
 import com.example.moneytransferapi.exception.InvalidUserDataException;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import com.example.moneytransferapi.service.IUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,7 +29,6 @@ public class UserController {
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
 
     }
-    // 30  7
 
     @PostMapping("/login")
     public ResponseEntity<TokensDto> login(@Valid @RequestBody LoginDto loginDto) {
@@ -40,6 +40,12 @@ public class UserController {
         System.out.println("Received TokenDto: " + tokenDto.getAccessToken());
         return  ResponseEntity.ok(userService.logout(tokenDto));
     }
+    @PutMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto, HttpServletRequest request){
+        return ResponseEntity.ok(userService.updatePassword(updatePasswordDto,request));
+    }
+
+
 
 
 }

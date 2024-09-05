@@ -7,8 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class FavouriteDTO {
     private int userId;
-    private int accountId;
+    private Long accountId;
     private String name;
 }
