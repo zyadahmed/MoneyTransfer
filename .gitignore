@@ -3,21 +3,19 @@
 *.iml
 *.iws
 out/
-target/
 
-# Gradle files
-.gradle/
-build/
-
-# Maven files
-target/
+# Maven specific files
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
-# Eclipse files
+# Gradle specific files
+.gradle/
+build/
+
+# Eclipse specific files
 .project
 .classpath
 .settings/
@@ -32,3 +30,9 @@ Desktop.ini
 
 # Linux specific files
 *~
+
+# Ignore everything in the target directory
+target/
+
+# But not JAR files
+!target/*.jar
