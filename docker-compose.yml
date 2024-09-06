@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: money_transfer_api
+    working_dir: /app
+    volumes:
+      - ./target/MoneyTransferAPI-0.0.1-SNAPSHOT.jar:/app/app.jar  # Replace with exact JAR file name
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_NAME=MoneyTransferAPI
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pg-1a6fa077-ziadahmeds2002-0c47.d.aivencloud.com:21545/defaultdb
+      - SPRING_DATASOURCE_USERNAME=avnadmin
+      - SPRING_DATASOURCE_PASSWORD=AVNS_gutP4HHhRcSSRWqiq3g
+      - SPRING_JPA_GENERATE_DDL=true
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - TOKEN_EXPIRATION_TIME_MINUTES=30
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
+      - SPRING_DATA_REDIS_HOST=redis-11194.c339.eu-west-3-1.ec2.redns.redis-cloud.com
+      - SPRING_DATA_REDIS_PORT=11194
+      - SPRING_DATA_REDIS_PASSWORD=9qM2Ny7hv2e5Bje0B9jaIPnAC8oGULr8
+    expose:
+      - 8080
+    command: ["java", "-jar", "app.jar"]
