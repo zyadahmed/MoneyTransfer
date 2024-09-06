@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Favoutire")
+@RequestMapping("/api/v1/user/Favourite")
 @RequiredArgsConstructor
 public class FavouriteController {
     private final IFavouriteService favouriteService;
@@ -30,7 +30,7 @@ public class FavouriteController {
         return favouriteService.deleteFavourite(accountId ,request);
     }
 
-    @GetMapping("/GetFavoutite/{userId}")
+    @GetMapping("/GetFavourite/{userId}")
     public List<FavouriteDTO> getFavorites(@PathVariable int userId, HttpServletRequest request) {
         return favouriteService.getFavorites(userId,request);
     }

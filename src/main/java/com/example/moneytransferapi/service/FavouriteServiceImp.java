@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class FavouriteServiceImp implements IFavouriteService {
     private final ModelMapper mapper;
 
     private final JwtUtil jwtUtil;
+
+
+    @Transactional
 
     public FavouriteDTO addFavourite(FavouriteDTO favouriteDTO, HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
@@ -47,6 +51,7 @@ public class FavouriteServiceImp implements IFavouriteService {
     }
 
     @Override
+    @Transactional
     public ResponseFavouriteDTO deleteFavourite(Long accountId,HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
         int userIdToken = jwtUtil.extractUserId(token);

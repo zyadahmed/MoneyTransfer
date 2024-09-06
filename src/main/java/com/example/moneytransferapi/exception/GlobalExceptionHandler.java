@@ -92,5 +92,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidAccountData.class)
+    ResponseEntity<String> invalidAccountData(InvalidAccountData e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 
-}
+
+    }

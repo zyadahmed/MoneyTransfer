@@ -17,29 +17,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/user")
 @AllArgsConstructor
 public class UserController {
 
     private final IUserService userService;
 
-    @PostMapping("/create")
-    public ResponseEntity<ResponseUserDTo> createUser(@Valid @RequestBody RegistrationDto newUser) {
-            ResponseUserDTo savedUser = userService.createUser(newUser);
-            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<TokensDto> login(@Valid @RequestBody LoginDto loginDto) {
-        TokensDto token =  userService.login(loginDto);
-        return ResponseEntity.ok(token);
-    }
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody TokensDto tokenDto){
-        System.out.println("Received TokenDto: " + tokenDto.getAccessToken());
-        return  ResponseEntity.ok(userService.logout(tokenDto));
-    }
     @PutMapping("/update-password")
     public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto, HttpServletRequest request){
         return ResponseEntity.ok(userService.updatePassword(updatePasswordDto,request));
