@@ -13,6 +13,7 @@ import com.example.moneytransferapi.repositorie.AccountRepository;
 import com.example.moneytransferapi.repositorie.TrascationRepository;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import com.example.moneytransferapi.utilitys.JwtUtil;
+import com.example.moneytransferapi.utilitys.NotificationConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,9 @@ public class AccountServiceImpl implements IAccountService{
     private final ModelMapper mapper;
     private final TrascationRepository trascationRepository;
     private final EntityManager entityManager;
+    private final NotificationConverter notificationConverter;
+    private final RabbitMQProducer rabbitMQProducer;
+
 
 
     @Override
@@ -103,6 +107,12 @@ public class AccountServiceImpl implements IAccountService{
                 .receiverAccount(receiverAccount).build();
 
         trascationRepository.save(transaction);
+
+        NotificationDto senderNotification = notificationConverter.createSenderNotification(transaction);
+        NotificationDto receiverNotification = notificationConverter.createReceiverNotification(transaction);
+
+        rabbitMQProducer.sendMessage(senderNotification);
+        rabbitMQProducer.sendMessage(receiverNotification);
 
         return  ResponseTransactionDTO.builder()
                 .reciverAccountNum(receiverAccount.getId())
