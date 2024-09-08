@@ -5,6 +5,7 @@ import com.example.moneytransferapi.entity.User;
 import com.example.moneytransferapi.enums.Role;
 import com.example.moneytransferapi.exception.InvalidUserDataException;
 import com.example.moneytransferapi.repositorie.UserRepository;
+import com.example.moneytransferapi.utilitys.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 import java.util.Optional;
@@ -28,10 +36,17 @@ class UserServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtUtil jwtUtil;
 
     @Mock
     private ModelMapper mapper;
 
+    @Mock
+    private TokenService tokenService;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -39,6 +54,16 @@ class UserServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+    @BeforeEach
+    public void setup() {
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        ServletRequestAttributes attributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(attributes);
+
+        when(jwtUtil.getTokenFromRequest(any(HttpServletRequest.class))).thenReturn("mockedToken");
+    }
+
+    @Test
 
     void testCreateUser_Success() {
         RegistrationDto registrationDto = new RegistrationDto("ziad", "zyad@gmail.com", "Ziad@123z", "Egypt", new Date(2000, 1, 1));
@@ -61,6 +86,8 @@ class UserServiceImplTest {
         assertThat(response).isNotNull();
         verify(userRepository).saveAndFlush(user);
     }
+
+    @Test
     void testCreateUser_existEmail(){
         RegistrationDto registrationDto = new RegistrationDto("ziad", "zyad@gmail.com", "Ziad@123z", "Egypt", new Date(2000, 1, 1));
 
@@ -71,30 +98,48 @@ class UserServiceImplTest {
         verify(userRepository, never()).saveAndFlush(any(User.class));
     }
     @Test
-    void testLogin_Success(){
-        LoginDto loginDto = new LoginDto("zyad@gmail.com","Ziad@123");
+    void testLogin_Success() {
+        LoginDto loginDto = new LoginDto("zyad@gmail.com", "Ziad@123");
         User user = new User();
         user.setEmail("zyad@gmail.com");
         user.setPassword("encodedPassword");
 
         when(userRepository.findUserByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(loginDto.getPassword(),user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())).thenReturn(true);
+
+        Authentication authentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
+        UserDetails userDetails = mock(UserDetails.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+
+        when(jwtUtil.generateToken(userDetails)).thenReturn("mockedJwtToken");
+        when(tokenService.generateRefreshToken(user)).thenReturn("mockedRefreshToken");
 
         TokensDto tokensDto = userService.login(loginDto);
+
         assertThat(tokensDto).isNotNull();
+        assertThat(tokensDto.getAccessToken()).isEqualTo("mockedJwtToken");
+        assertThat(tokensDto.getRefreshToken()).isEqualTo("mockedRefreshToken");
 
     }
 
     @Test
     void testLogin_invalidPassword(){
-        LoginDto loginDto = new LoginDto("zyad@gmail.com", "ziad");
+        LoginDto loginDto = new LoginDto("zyad@gmail.com", "ziad"); // Incorrect password
         User user = new User();
         user.setEmail("zyad@gmail.com");
         user.setPassword("encoded");
-        when(userRepository.findUserByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())).thenReturn(false);
 
-        assertThrows(InvalidUserDataException.class,()->userService.login(loginDto));
+        when(userRepository.findUserByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new AuthenticationException("Authentication failed") {});
+
+        assertThrows(InvalidUserDataException.class, () -> userService.login(loginDto));
+
+
 
 
     }
@@ -108,7 +153,9 @@ class UserServiceImplTest {
         when(passwordEncoder.matches(updatePasswordDto.getOldPassword(), user.getPassword())).thenReturn(true);
         when(passwordEncoder.encode(updatePasswordDto.getNewPassword())).thenReturn("encodedNewPassword");
 
-        String result = userService.updatePassword(updatePasswordDto, mock(HttpServletRequest.class));
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        String result = userService.updatePassword(updatePasswordDto, request);
 
         assertThat(result).isEqualTo("Password updated successfully");
         verify(userRepository).save(user);
@@ -116,7 +163,6 @@ class UserServiceImplTest {
 
     @Test
     void testUpdatePassword_OldPasswordIncorrect() {
-        // Arrange
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto("WrongOldPassword", "NewPassword");
         User user = new User();
         user.setPassword("encodedOldPassword");
@@ -124,8 +170,11 @@ class UserServiceImplTest {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(updatePasswordDto.getOldPassword(), user.getPassword())).thenReturn(false);
 
-        // Act & Assert
-        assertThrows(InvalidUserDataException.class, () -> userService.updatePassword(updatePasswordDto, mock(HttpServletRequest.class)));
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        assertThrows(InvalidUserDataException.class, () -> {
+            userService.updatePassword(updatePasswordDto, request);
+        });
     }
 
 }
