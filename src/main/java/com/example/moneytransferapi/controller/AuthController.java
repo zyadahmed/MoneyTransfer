@@ -14,19 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/auth")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class AuthController {
 
     private final TokenService tokenService;
     private final IUserService userService;
 
     @PostMapping("/refresh")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<TokensDto> refreshAccessToken(@RequestBody RefreshTokenDto refreshToken) {
         TokensDto newTokens = tokenService.refreshAccessToken(refreshToken.getRefreshToken());
         return ResponseEntity.ok(newTokens);
     }
     @PostMapping("/create")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<ResponseUserDTo> createUser(@Valid @RequestBody RegistrationDto newUser) {
         ResponseUserDTo savedUser = userService.createUser(newUser);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
@@ -34,13 +33,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<TokensDto> login(@Valid @RequestBody LoginDto loginDto) {
         TokensDto token =  userService.login(loginDto);
         return ResponseEntity.ok(token);
     }
     @PostMapping("/logout")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<String> logout(@RequestBody TokensDto tokenDto){
         System.out.println("Received TokenDto: " + tokenDto.getAccessToken());
         return  ResponseEntity.ok(userService.logout(tokenDto));

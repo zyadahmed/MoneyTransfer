@@ -17,23 +17,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/user/Favourite")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class FavouriteController {
     private final IFavouriteService favouriteService;
 
     @PostMapping("/AddFavourite")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public FavouriteDTO addFavourite(@RequestBody @Valid FavouriteDTO favouriteDTO, HttpServletRequest request) {
         return favouriteService.addFavourite(favouriteDTO, request);
     }
 
     @DeleteMapping("/{accountId}")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseFavouriteDTO deleteFavorite(@PathVariable @Valid Long accountId, HttpServletRequest request) {
         return favouriteService.deleteFavourite(accountId ,request);
     }
 
     @GetMapping("/GetFavourite/{userId}")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public List<FavouriteDTO> getFavorites(@PathVariable int userId, HttpServletRequest request) {
         return favouriteService.getFavorites(userId,request);
     }

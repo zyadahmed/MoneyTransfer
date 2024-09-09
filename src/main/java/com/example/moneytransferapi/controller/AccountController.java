@@ -19,19 +19,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class AccountController {
 
     private final IAccountService accountService;
 
     @PostMapping("/create")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<ResponseAccountDto> createAccount(@RequestBody @Valid RegisterationAccountDto registerationAccountDto , HttpServletRequest request){
        ResponseAccountDto response =  accountService.createAccount(registerationAccountDto,request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/transaction")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<ResponseTransactionDTO> createTransaction(
             @RequestBody RequestTrascationDto requestTransactionDto,
             HttpServletRequest request) {
@@ -41,24 +40,20 @@ public class AccountController {
     }
 
     @GetMapping("/ViewUserAccount")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public List<AccountDTO> viewAllUserAccounts(HttpServletRequest request) {
         return accountService.viewAllUserAccounts(request);
     }
 
     @GetMapping("/GetAccountByID/{accountID}")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable  Long accountID, HttpServletRequest request) {
         return new ResponseEntity<>(accountService.getAccountById(request,accountID), HttpStatus.OK);
     }
 
     @GetMapping("/GetAccountBalance/{accountID}")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<BalanceDto> getAccountBalance(@PathVariable Long accountID,HttpServletRequest request) {
         return new ResponseEntity<>(accountService.getAccountBalance(request,accountID), HttpStatus.OK);
     }
     @PostMapping("/transaction/all")
-    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<Page<TransactionDto>> getAccountById(@RequestBody ViewTransactionsDto viewTransactionsDto ,  HttpServletRequest request) {
         return new ResponseEntity<>(accountService.getTransactionForAccount(request,viewTransactionsDto), HttpStatus.OK);
     }
