@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -112,10 +113,33 @@ public class UserServiceImpl implements IUserService{
 
     }
 
+//    @Override
+//    public User getUserWithAccounts(HttpServletRequest request) {
+//        String token = jwtUtil.getTokenFromRequest(request);
+//        int currentUserId = jwtUtil.extractUserId(token);
+//        User user =  userRepository.findUserWithAccountsById(currentUserId);
+//
+//    }
     @Override
-    public User getUserWithAccounts(HttpServletRequest request) {
+    public UserDto getUserWithAccounts(HttpServletRequest request) {
         String token = jwtUtil.getTokenFromRequest(request);
         int currentUserId = jwtUtil.extractUserId(token);
-        return userRepository.findUserWithAccountsById(currentUserId);
+
+        User user = userRepository.findUserWithAccountsById(currentUserId);
+
+        UserDto userDto = mapper.map(user, UserDto.class);
+
+        List<AccountDTO> accountDtos = user.getAccounts().stream()
+                .map(account -> {
+                    AccountDTO accountDto = mapper.map(account, AccountDTO.class);
+                    accountDto.setBalance(account.getBalance() / 100f); // Divide balance by 100
+                    return accountDto;
+                })
+                .toList();
+
+        userDto.setAccounts(accountDtos);
+
+        return userDto;
     }
+
 }

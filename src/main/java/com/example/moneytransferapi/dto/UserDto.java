@@ -6,10 +6,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
 
+
+@Getter
+@Setter
 public class UserDto {
     private int id;
     private String name;
@@ -19,7 +24,7 @@ public class UserDto {
     private Date dateofbirth;
 
 
-    private List<Account> accounts;
+    private List<AccountDTO> accounts;
 
 
 }

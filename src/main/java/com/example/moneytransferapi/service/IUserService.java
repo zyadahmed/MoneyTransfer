@@ -12,6 +12,6 @@ public interface IUserService {
 
     String logout(TokensDto tokenDto);
     String updatePassword(UpdatePasswordDto updatePasswordDto, HttpServletRequest request);
-    User getUserWithAccounts(HttpServletRequest request);
+    UserDto getUserWithAccounts(HttpServletRequest request);
 
 }

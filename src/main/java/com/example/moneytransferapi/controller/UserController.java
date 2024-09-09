@@ -29,10 +29,9 @@ public class UserController {
         return ResponseEntity.ok(userService.updatePassword(updatePasswordDto,request));
     }
     @GetMapping("/info")
-    public ResponseEntity<User> getUserInfo(HttpServletRequest request){
+    public ResponseEntity<UserDto> getUserInfo(HttpServletRequest request){
         return ResponseEntity.ok(userService.getUserWithAccounts(request));
     }
-
 
 
 
