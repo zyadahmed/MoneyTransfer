@@ -13,6 +13,7 @@ import com.example.moneytransferapi.repositorie.AccountRepository;
 import com.example.moneytransferapi.repositorie.TrascationRepository;
 import com.example.moneytransferapi.repositorie.UserRepository;
 import com.example.moneytransferapi.utilitys.JwtUtil;
+import com.example.moneytransferapi.utilitys.NotificationConverter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,11 @@ import static org.mockito.Mockito.*;
 class AccountServiceImplTest {
 
 
+    @Mock
+    private NotificationConverter notificationConverter;
+
+    @Mock
+    private RabbitMQProducer rabbitMQProducer;
     @Mock
     private  AccountRepository accountRepository;
 
