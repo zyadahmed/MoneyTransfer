@@ -44,7 +44,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain httpSecurity(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .cors().and()
+                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**","/swagger-ui/**", "/swagger-resources/**", "/webjars/**","/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
