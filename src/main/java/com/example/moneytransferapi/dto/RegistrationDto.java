@@ -1,9 +1,6 @@
 package com.example.moneytransferapi.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -22,7 +19,7 @@ public class RegistrationDto {
     @Email(message = "not valid Email")
     private String email;
     @NotBlank(message = "password is mandatory")
-//    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters long, contain at least one letter, one digit, and one special character.")
+    @Size(min = 6)
     private String password;
 
     @NotBlank(message = "Country is required")
