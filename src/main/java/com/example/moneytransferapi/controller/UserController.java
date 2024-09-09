@@ -24,10 +24,12 @@ public class UserController {
     private final IUserService userService;
 
     @PutMapping("/update-password")
+    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto, HttpServletRequest request){
         return ResponseEntity.ok(userService.updatePassword(updatePasswordDto,request));
     }
     @GetMapping("/info")
+    @CrossOrigin(origins = "*", maxAge = 3600)
     public ResponseEntity<User> getUserInfo(HttpServletRequest request){
         return ResponseEntity.ok(userService.getUserWithAccounts(request));
     }
