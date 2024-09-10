@@ -1,5 +1,7 @@
 package com.example.moneytransferapi.securityconfig;
 
+import com.example.moneytransferapi.exception.CustomAuthenticationException;
+import com.example.moneytransferapi.security.CustomAuthenticationEntryPoint;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +36,7 @@ import java.util.List;
 public class WebSecurityConfig {
     private final JwtAuthFIlter authFIlter;
     private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -45,6 +48,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain httpSecurity(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf().disable()
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**","/swagger-ui/**", "/swagger-resources/**", "/webjars/**","/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())

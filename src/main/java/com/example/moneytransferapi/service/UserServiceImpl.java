@@ -43,6 +43,7 @@ public class UserServiceImpl implements IUserService{
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
     private final TokenService tokenService;
+    private final SessionService sessionService;
     private static final String TOKEN_PREFIX = "b:";
 
 
@@ -74,7 +75,11 @@ public class UserServiceImpl implements IUserService{
             User user = userRepository.findUserByEmail(loginDto.getEmail())
                     .orElseThrow(() -> new InvalidUserDataException("User not found"));
 
-            return new TokensDto(jwtUtil.generateToken(userDetails),tokenService.generateRefreshToken(user));
+
+            TokensDto tokensDto =  new TokensDto(jwtUtil.generateToken(userDetails),tokenService.generateRefreshToken(user));
+            sessionService.createSession(tokensDto.getAccessToken());
+            return tokensDto;
+
 
         } catch (AuthenticationException e) {
             throw new InvalidUserDataException("Invalid email or password.");

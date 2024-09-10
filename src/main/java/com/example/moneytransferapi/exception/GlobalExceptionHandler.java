@@ -96,6 +96,11 @@ public class GlobalExceptionHandler {
     ResponseEntity<String> invalidAccountData(InvalidAccountData e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+    @ExceptionHandler(CustomAuthenticationException.class)
+    ResponseEntity<String> authTimeOut(CustomAuthenticationException e){
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
 
 
     }

@@ -20,4 +20,7 @@ public class RedisService {
         Long expireTime = redisTemplate.getExpire("b:"+key, TimeUnit.SECONDS);
         return expireTime != null && expireTime != -2;
     }
+    public Long getExpire(String key) {
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    }
 }
