@@ -48,9 +48,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain httpSecurity(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf().disable()
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**","/swagger-ui/**", "/swagger-resources/**", "/webjars/**","/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
