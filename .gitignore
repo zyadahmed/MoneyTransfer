@@ -34,5 +34,4 @@ Desktop.ini
 # Ignore everything in the target directory
 target/
 
-# But not JAR files
-!target/*.jar
+
