@@ -19,8 +19,9 @@ public class SessionService {
         String key = tokenPrefix + token;
 
         Long remainingTime = redisService.getExpire(key);
+        System.out.println("remaing time" + remainingTime);
 
-        if (remainingTime == null || remainingTime == -2) {
+        if (remainingTime == null || remainingTime < 0) {
             return false;
         }
 

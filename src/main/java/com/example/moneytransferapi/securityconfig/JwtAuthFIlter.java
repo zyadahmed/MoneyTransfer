@@ -32,7 +32,6 @@ public class JwtAuthFIlter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final RedisService redisService;
     private final SessionService sessionService;
-    private final GlobalExceptionHandler handler;
     private static final String TOKEN_PREFIX = "b:";
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -53,7 +52,8 @@ public class JwtAuthFIlter extends OncePerRequestFilter {
             return;
         }
         if (!sessionService.stillActive(authToken)) {
-            handler.unauthorizedException(new UnauthorizedAccessException("Session is expired"));
+            filterChain.doFilter(request,response);
+            return;
         }
 
         Function<Claims,String> extractEmail = Claims::getSubject;
@@ -68,47 +68,6 @@ public class JwtAuthFIlter extends OncePerRequestFilter {
 
 
     }
-//  @Override
-//  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//
-//      if (SecurityContextHolder.getContext().getAuthentication() != null) {
-//          filterChain.doFilter(request, response);
-//          return;
-//      }
-//
-//      String authToken = request.getHeader("Authorization");
-//      if (authToken == null || !authToken.startsWith("Bearer ")) {
-//          filterChain.doFilter(request, response);
-//          return;
-//      }
-//
-//      authToken = authToken.substring(7);
-//
-//      try {
-//          if (!jwt.isValid(authToken) || redisService.keyExists(authToken)) {
-//              handler.unauthorizedException(new UnauthorizedAccessException("Session is expired"));
-//              throw new CustomAuthenticationException("Invalid or blacklisted token.");
-//          }
-//          if (!sessionService.stillActive(authToken)) {
-//              throw new CustomAuthenticationException("Session has expired or is inactive.");
-//          }
-//
-//          Function<Claims, String> extractEmail = Claims::getSubject;
-//          String usermail = jwt.extractClaim(authToken, extractEmail);
-//
-//          UserDetails currentUser = userDetailsService.loadUserByUsername(usermail);
-//          UsernamePasswordAuthenticationToken authenticationToken =
-//                  new UsernamePasswordAuthenticationToken(currentUser, null, currentUser.getAuthorities());
-//          SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//
-//          filterChain.doFilter(request, response);
-//
-//      } catch (CustomAuthenticationException e) {
-//          SecurityContextHolder.clearContext();
-//          response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//          response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//          response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
-//      }
-//  }
+
 
 }

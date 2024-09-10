@@ -28,6 +28,7 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtService;
+    private final SessionService sessionService;
 
     public String generateRefreshToken(User user) {
         String rawRefreshToken = jwtService.generateRefreshToken(user);
@@ -84,6 +85,7 @@ public class TokenService {
             markTokenAsUsed(savedrefreshTokenOptional.get().getToken());
             String newAccessToken = jwtService.generateToken(new UserSecurityAdapter(user));
             String newRefreshToken = generateRefreshToken(user);
+            sessionService.createSession(newAccessToken);
 
             return new TokensDto(newAccessToken, newRefreshToken);
         } else {
