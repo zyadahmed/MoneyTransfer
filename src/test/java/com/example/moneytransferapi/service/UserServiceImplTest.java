@@ -46,6 +46,9 @@ class UserServiceImplTest {
     private TokenService tokenService;
 
     @Mock
+    private SessionService sessionService;
+
+    @Mock
     private AuthenticationManager authenticationManager;
     @InjectMocks
     private UserServiceImpl userService;
