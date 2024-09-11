@@ -18,5 +18,6 @@ public class TransactionDto {
         private LocalDateTime createdTimeStamp;
         private Long senderAccountId;
         private Long reciverAccountId;
-
+        String senderName;
+        String receiverName;
 }

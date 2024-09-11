@@ -23,6 +23,11 @@ public class Transaction {
     @Column(nullable = false)
     private Long amount;
 
+    @Column(nullable = true)
+    private String senderName;
+    @Column(nullable = true)
+    private String receiverName;
+
 
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;

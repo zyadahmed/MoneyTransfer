@@ -103,6 +103,8 @@ public class AccountServiceImpl implements IAccountService{
         accountRepository.save(receiverAccount);
         Transaction transaction = Transaction.builder().amount(amountInLong)
                 .status(TransactionStatus.SUCCEED)
+                .senderName(requestTrascationDto.getSenderName())
+                .receiverName(requestTrascationDto.getReceiverName())
                 .senderAccount(senderAccount)
                 .receiverAccount(receiverAccount).build();
 
@@ -118,6 +120,8 @@ public class AccountServiceImpl implements IAccountService{
                 .reciverAccountNum(receiverAccount.getId())
                 .senderAccountNum(senderAccount.getId())
                 .trascationTime(LocalDateTime.now())
+                .senderName(requestTrascationDto.getSenderName())
+                .receiverName(requestTrascationDto.getReceiverName())
                 .amount((float) amountInLong /100)
                 .status(TransactionStatus.SUCCEED)
                 .build();

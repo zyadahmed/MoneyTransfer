@@ -19,5 +19,9 @@ public class RequestTrascationDto {
     @Positive(message = "Transaction must be  positive value")
     float amount;
 
+     String senderName;
+     String receiverName;
+
+
 
 }

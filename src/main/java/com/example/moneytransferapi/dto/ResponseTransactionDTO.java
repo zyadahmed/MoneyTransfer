@@ -16,4 +16,7 @@ public class ResponseTransactionDTO {
     float amount;
     TransactionStatus status;
     LocalDateTime trascationTime;
+     String senderName;
+     String receiverName;
+
 }
